@@ -83,18 +83,18 @@ router.post("/user/login", async (req, res) => {
 });
 
 router.put("/user/addFavorites", isAuthenticated, async (req, res) => {
-  const user = await User.findOne({ token: req.fields.token });
-  for (let i = 0; i < user.charactersFav.length; i++) {
-    if (user.charactersFav[i].id === req.fields.id) {
-      return res.status(400).json("Already put in favorites");
-    }
-  }
-  for (let i = 0; i < user.comicsFav.length; i++) {
-    if (user.comicsFav[i].id === req.fields.id) {
-      return res.status(400).json("Already put in favorites");
-    }
-  }
   try {
+    const user = await User.findOne({ token: req.fields.token });
+    for (let i = 0; i < user.charactersFav.length; i++) {
+      if (user.charactersFav[i].id === req.fields.id) {
+        return res.status(400).json("Already put in favorites");
+      }
+    }
+    for (let i = 0; i < user.comicsFav.length; i++) {
+      if (user.comicsFav[i].id === req.fields.id) {
+        return res.status(400).json("Already put in favorites");
+      }
+    }
     if (req.fields.id && req.fields.name) {
       user.charactersFav.push({
         id: req.fields.id,
