@@ -18,13 +18,6 @@ app.use(formidableMiddleware());
 app.use(cors());
 app.use(userRoute);
 
-app.get("/favorites", async (req, res) => {
-  try {
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
 app.get("/comics/:id", async (req, res) => {
   try {
     const response = await axios.get(

@@ -86,35 +86,51 @@ router.put("/user/addFavorites", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findOne({ token: req.fields.token });
     for (let i = 0; i < user.charactersFav.length; i++) {
-      if (user.charactersFav[i].id === req.fields.id) {
+      if (user.charactersFav[i]._id === req.fields.fav._id) {
         return res.status(400).json("Already put in favorites");
       }
     }
     for (let i = 0; i < user.comicsFav.length; i++) {
-      if (user.comicsFav[i].id === req.fields.id) {
+      if (user.comicsFav[i]._id === req.fields.fav._id) {
         return res.status(400).json("Already put in favorites");
       }
     }
-    if (req.fields.id && req.fields.name) {
-      user.charactersFav.push({
-        id: req.fields.id,
-        name: req.fields.name,
-        thumbnail: req.fields.thumbnail,
-      });
+    if (req.fields.fav._id && req.fields.fav.name) {
+      user.charactersFav.push(req.fields.fav);
       // Tell at Mongoose we modified the array : charactersFav.
       user.markModified("charactersFav");
-    } else if (req.fields.title) {
-      user.comicsFav.push({
-        id: req.fields.id,
-        title: req.fields.title,
-        thumbnail: req.fields.thumbnail,
-      });
+    } else if (req.fields.fav.title && req.fields.fav._id) {
+      user.comicsFav.push(req.fields.fav);
       // Tell at Mongoose we modified the array : comicsFav.
       user.markModified("comicsFav");
     }
 
     await user.save();
-    res.status(200).json("add user's favorites!");
+    res.status(200).json("favory added");
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+router.put("/user/removeFavorites", isAuthenticated, async (req, res) => {
+  try {
+    const user = await User.findOne({ token: req.fields.token });
+    if (req.fields.id) {
+      for (let i = 0; i < user.comicsFav.length; i++) {
+        if (user.comicsFav[i]._id === req.fields.id) {
+          user.comicsFav.splice(i, 1);
+          user.markModified("comicsFav");
+        }
+      }
+      for (let i = 0; i < user.charactersFav.length; i++) {
+        if (user.charactersFav[i]._id === req.fields.id) {
+          user.charactersFav.splice(i, 1);
+          user.markModified("charactersFav");
+        }
+      }
+    }
+    await user.save();
+    res.status(200).json({ message: "Delete fav sucess" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
